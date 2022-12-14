@@ -5,35 +5,51 @@
 \title{Simulate data from bivariate correlated frailty models.}
 \usage{
 simbcfraildv(
-  p.size,
-  c.rate = c(0),
-  fraildistrn,
-  frail.par = c(0.5, 0.5, 0.25),
-  bhaz.arg = list(distrn = c("weibull"), shape = c(2.5), scale = c(0.01), rate =
-    c(0.5)),
-  covar.arg = list(coefs = c(0.5, 0), types = c("BU", "BB", "UU", "B", "U"), size =
-    c(1, 1), prob = c(0.5, 0.6), min = c(0, 0), max = c(1, 3))
+  psize,
+  cenr = c(0),
+  beta = c(0.5),
+  frailty,
+  frailpar = c(0.5, 0.5, 0.25),
+  bhaz = c("weibull"),
+  bhazpar = list(shape = c(0.5), scale = c(0.01)),
+  covartype = c("B"),
+  covarpar = list(fargs = c(1), sargs = c(0.5)),
+  inpcovar = NULL,
+  inpcen = NULL,
+  comncovar = NULL
 )
 }
 \arguments{
-\item{p.size}{pair size.}
+\item{psize}{pair size.}
 
-\item{c.rate}{censored rate. The default is zero..}
+\item{cenr}{censored rate. The default is zero..}
 
-\item{fraildistrn}{A type of frailty distribution to be used. Either gamma or log-normal.}
+\item{beta}{Covariate coefficient.}
 
-\item{frail.par}{vector of frailty parameters, variance and correlation respectively. The default is c(0.5,0.5,0.25) meaning frailty variance of subject1 is 0.5, frailty variance of subject2 is 0.5, and correlation 0.25.}
+\item{frailty}{A type of frailty distribution to be used. Either gamma or lognormal.}
 
-\item{bhaz.arg}{is a \code{\link{list}} i.e,\code{list(distrn = c("weibull"),shape =c(2.5), scale = c(0.01), rate = c(0.5))}.\code{distrn} is the type of baseline hazard to be used. weibull, gompertz and exponential is possible. \code{shape}, \code{scale} and \code{rate} are the parameters of the coresponding baseline hazard parameters. rate needs to be specified if the baseline is exponential.}
+\item{frailpar}{vector of frailty parameters, variance and correlation respectively. The default is c(0.5,0.5,0.25) meaning both variances are 0.5 and correlation 0.25.}
 
-\item{covar.arg}{is a \code{\link{list}} i.e,\code{coefs} is covariate coefficients, \code{types} is the type of covariate to be used. One of the following can be specified \code{c("BU","BB","UU","B","U")}. Use \code{"BU"} if one binomial and one uniform covariates are desired.\code{"BB"} is for two binomial covariates. \code{"B"} is for binomial and \code{"U"} is for uniform.\code{size} and \code{prob} needs to be specified if binomial covariate(s) are used and if uniform covariate(s) are used, then \code{min} and \code{max} should be specified.}
+\item{bhaz}{A type of baseline hazard distribution to be used. it can be weibull, gompertz or exponential.}
+
+\item{bhazpar}{is a \code{\link{list}} containing \code{scale} and\code{shape} of the specified baseline hazard distribution.}
+
+\item{covartype}{specified the distribution from which covariate(s) are goining to be sampled. covartype can be c("B","N","U")denoting binomial, normal or uniform, respectively. For example, \code{covartype=c("B","B")} to generate two covariates both from a binomial distribution.}
+
+\item{covarpar}{is a \code{\link{list}} containing parmeters of the specified covariate distribution with first and second arguments denoted by \code{fargs} and \code{sargs}, respectively. For example, if \code{covartype=c("B","U")} and \code{covarpar=list(fargs=c(1,0.3),sargs=c(0.5,1.3))}, generates two independent covariates from a binomial distribution (with parameters size=1 and probs=0.5) and from uniform distributions (with parameters min=0.3 and max=1.3).}
+
+\item{inpcovar}{is a \code{\link{list}} i.e,list(covar1=x1,covar2=x2) to input covariates with both x1 and x2 is in matrix form.}
+
+\item{inpcen}{is a \code{\link{list}} containing \code{cent1} and \code{cent2} denoting censoring time for the first and the second subjects in pairs respectively.}
+
+\item{comncovar}{if common covariates are needed.}
 }
 \value{
 An object of class \code{simbcfraildv} that contain the following:
 
 \itemize{
 
-\item{\code{data}}  {A data frame i.e, the simulated data set. IID is individual Id, PID is pair ID, time is the simulated survival time, censor is censoring indicator and X1 or X2 denote the simulated covariate.}
+\item{\code{data}}  {A data frame i.e, the simulated data set. IID is individual Id, PID is pair ID, time is the simulated survival time, censor is censoring indicator and X1 denote the simulated covariate.}
 
 \item{\code{numberofpair}}  {The specified number of pairs.}
 
@@ -45,81 +61,44 @@ An object of class \code{simbcfraildv} that contain the following:
 }
 }
 \description{
-Simulate data from bivariate correlated gamma and log-normal frailty models with observed covariates. It allows inclussion of one or two covariates. In addition, frailty variances of the two artificial subjects can be equal or different.
+Simulate data from bivariate correlated gamma or lognormal frailty models with one covariate.
 }
 \examples{
-simdata<-simbcfraildv(p.size=1000, c.rate= c(0.2),fraildistrn=c("gamma"),frail.par=c(0.5,0.5,0.5),
-bhaz.arg=list(distrn = c("gompertz"),shape =c(3), scale = c(0.1)),
-covar.arg=list(coefs=c(1),types = c("U"),min=0,max=1))
-simdata
+set.seed(4)
+simdata<-simbcfraildv(psize=300, cenr= c(0.3),beta=c(2),frailty=c("gamma"),
+frailpar=c(0.5,0.5,0.5),bhaz=c("weibull"),
+bhazpar=list(shape =c(5), scale = c(0.1)),
+covartype= c("B"),covarpar=list(fargs=c(1),sargs=c(0.5)))
+dataa<-simdata$data
+head(dataa)
 
 \donttest{
-#Let us simulate a data set with the following parameters
-#weibull baseline hazard with parameters shape= 2.5 and scale=0.01.
-#a dataset with 1000 pairs. Frailty distribution is gamma
-# and the frailty parameters are taken to
-#be variance1=0.6,variance2=0.4 and correlation =0.2.
-#One binomial covariate i.e,
-#(Binomial (1,0.5)) with regression coefficient 0.5.
-#Each observed covariate for the two individuals in a
-#pair is taken to be independent and 20 percent
-#observations are censored.
+# If data generation is from bivariate correlated lognormal frailty model,
+set.seed(18)
+simdata<-simbcfraildv(psize=100, cenr= c(0.2),beta=c(1,-0.7,0.5),frailty=c("lognormal"),
+frailpar=c(0.5,0.8,-0.25),bhaz=c("exponential"),
+bhazpar=list(scale = c(0.1)),covartype= c("N","N","B"),
+covarpar=list(fargs=c(0,0,1),sargs=c(1,1,0.5)))
+dataa<-simdata$data
+head(dataa)
 
-#simulate the data set
+# If common covariate is desired, i.e., here out of the three covariates 
+#covariate 2 is common for the pair.
+set.seed(18)
+simdata<-simbcfraildv(psize=100, cenr= c(0.2),beta=c(1,-0.7,0.5),frailty=c("lognormal"),
+frailpar=c(0.5,0.8,-0.25),bhaz=c("exponential"),
+bhazpar=list(scale = c(0.1)),covartype= c("N","N","B"),
+covarpar=list(fargs=c(0,0,1),sargs=c(1,1,0.5)),comncovar=2)
+dataa<-simdata$data
+head(dataa)
 
-set.seed(1)
-simdata<-simbcfraildv(p.size=1000, c.rate= c(0.2),
-fraildistrn=c("gamma"),frail.par=c(0.6,0.4,0.2),
-bhaz.arg=list(distrn = c("weibull"),shape =c(2.5), scale = c(0.01)),
-covar.arg=list(coefs=c(0.5),types = c("B"),size=1,prob=0.5))
-
-#to extract the simulated data set
-dataa<-simdata$data ## the simulated data set
-dataa[1:4,] # the first four rows looks like
-
-#  IID PID     time censor X1
-#1   1   1 2.704927      1  1
-#2   2   1 5.418071      0  1
-#3   3   2 4.602736      1  0
-#4   4   2 6.205303      1  0
-
-# IID is individual indicator
-# PID is pair indicator
-# time is the simulated survival time
-# censor is the simulated censoring indicator
-# X1 is the simulated covariate
-
-# if log-normal frailty is desired
-
-simdata<-simbcfraildv(p.size=1000, c.rate= c(0.2),
-fraildistrn=c("lognormal"),frail.par=c(0.6,0.4,0.2),
-bhaz.arg=list(distrn = c("weibull"),shape =c(2.5), scale = c(0.01)),
-covar.arg=list(coefs=c(0.5),types = c("B"),size=1,prob=0.5))
-
-dataa<-simdata$data # the simulated data set
-
-# if log-normal frailty with two covariates
-#i.e., binomial (Binomial (1,0.5)) and uniform U[0,1] is desired
-
-simdata<-simbcfraildv(p.size=1000, c.rate= c(0.2),
-fraildistrn=c("lognormal"),frail.par=c(0.6,0.4,0.2),
-bhaz.arg=list(distrn = c("weibull"),shape =c(2.5), scale = c(0.01)),
-covar.arg=list(coefs=c(0.5),types = c("BU"),
-size=1,prob=0.5,min=c(0),max=c(1)))
-
-dataa<-simdata$data ## the simulated data set
-
-# Not run
-# if p.size, pair size missed
-simdata<-simbcfraildv( c.rate= c(0.2),fraildistrn=c("gamma"),
-frail.par=c(0.6,0.4,0.2),
-covar.arg=list(coefs=c(0.5),types = c("B"),size=1,prob=0.5))
-
-# if frailty distribution other than gamma and lognormal specified
-
-simdata<-simbcfraildv(p.size=100, c.rate= c(0.2),fraildistrn=c("exp"),frail.par=c(0.6,0.4,0.6),
-covar.arg=list(coefs=c(0.5),types = c("B"),size=1,prob=0.5))
-# End Not run
+# If the data generation is from bivariate correlated gamma frailty model,
+#weibull baseline and without covariate,
+set.seed(4)
+simdata<-simbcfraildv(psize=300, cenr= c(0.3),beta=NULL,frailty=c("gamma"),
+frailpar=c(0.5,0.6,0.5),bhaz=c("weibull"),bhazpar=list(shape =c(5), scale = c(0.1)))
+dataa<-simdata$data
+head(dataa)
 }
 
 }

@@ -1,8 +1,7 @@
-#'
 #' @name summary.bcfraildv
 #' @title Print bcfraildv
 #' @description Generics to print the S3 class bcfraildv.
-#' @details Calls \code{summary.bcfraildv()}.
+#' @details Calls \code{print.bcfraildv()}.
 #'
 #' @param object A class \code{bcfraildv} object.
 #' @param ... ignored
@@ -17,16 +16,16 @@
 #' @seealso \code{\link{bcfraildv}}
 #'
 #' @examples
-#' set.seed(24)
-#' simdata<-simbcfraildv(p.size=300, c.rate= c(0.3),fraildistrn=c("gamma"),frail.par=c(0.5,0.5,0.5),
-#' bhaz.arg=list(distrn = c("weibull"),shape =c(5), scale = c(0.1)),
-#' covar.arg=list(coefs=c(2),types = c("B"),size=c(1),prob=c(0.5)))
+#' set.seed(4)
+#' simdata<-simbcfraildv(psize=300, cenr= c(0.3),beta=c(2),frailty=c("gamma"),
+#' frailpar=c(0.5,0.5,0.5),bhaz=c("weibull"),
+#' bhazpar=list(shape =c(5), scale = c(0.1)),
+#' covartype= c("B"),covarpar=list(fargs=c(1),sargs=c(0.5)))
 #' dataa<-simdata$data
 #'
-#' fitbcfraildv=bcfraildv(Surv(time,censor)~ X1+frailty(PID) ,data=dataa,frail_distrn=c("gamma"))
-#' fitbcfraildv
-#' summary(fitbcfraildv)
-#' names(fitbcfraildv)
+#' fitbcfrail=bcfraildv(Surv(time,censor)~ X1+frailty(PID) ,data=dataa)
+#' fitbcfrail
+#' summary(fitbcfrail)
 #'
 summary.bcfraildv<- function(object, ...)
 {
@@ -39,17 +38,16 @@ cat("\nRegression Coefficients:\n")
 zval <- object$coefficients/object$stderr[1:length(object$coefficients)]
 se=object$stderr
 RTAB <- cbind(Estimate =object$coefficients,StdErr =se[1:length(object$coefficients)],
-se2= c(sqrt(diag(object$vcov))),z.value =  zval,p.value = 2*(1-pnorm(abs(zval), mean=0,sd=1)))
+z.value =  zval,p.value = 2*(1-pnorm(abs(zval), mean=0,sd=1)))
 printCoefmat(RTAB, P.values=TRUE, has.Pvalue=TRUE)
-cat("\nFrailty Distribution:Bivariate Correlated ",object$frail_distrn,"\n")
-if(object$frail_distrn==c("gamma")){
-cat("Frailty variance 1 =",object$frailparest[1],"(",se[length(se)-2],")\n")
-cat("Frailty variance 2 =",object$frailparest[2],"(",se[length(se)-1],")\n")
-cat("Correlation Estimate =",object$frailparest[3],"(",se[length(se)],")\n")}
-if(object$frail_distrn==c("lognormal")){
-cat("Variance of random effect 1 =",object$frailparest[1],"(",se[length(se)-2],")\n")
-cat("Variance of random effect 2 =",object$frailparest[2],"(",se[length(se)-1],")\n")
-cat("Correlation Estimate of random effects =",object$frailparest[3],"(",se[length(se)],")\n")}
+cat("\nFrailty Distribution:Bivariate Correlated ",object$frailty,"\n")
+if(object$frailty==c("gamma")){
+  cat("Frailty variance 1 =",object$frailparest[1],"(",se[length(se)-2],")\n")
+  cat("Frailty variance 2 =",object$frailparest[2],"(",se[length(se)-1],")\n")
+  cat("Correlation Estimate =",object$frailparest[3],"(",se[length(se)],")\n")}
+if(object$frailty==c("lognormal")){
+  cat("Variance of random effect 1 =",object$frailparest[1],"\n")
+  cat("Variance of random effect 2 =",object$frailparest[2],"\n")
+  cat("Correlation Estimate of random effects =",object$frailparest[3],"\n")}
 cat("Log likelihood =",object$Iloglilk,"\n")
 }
-

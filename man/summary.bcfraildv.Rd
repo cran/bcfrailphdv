@@ -18,22 +18,22 @@ An object of \code{print.bcfraildv}, with some more human-readable results from 
 Generics to print the S3 class bcfraildv.
 }
 \details{
-Calls \code{summary.bcfraildv()}.
+Calls \code{print.bcfraildv()}.
 }
 \note{
 The summary function is currently identical to the print function.
 }
 \examples{
-set.seed(24)
-simdata<-simbcfraildv(p.size=300, c.rate= c(0.3),fraildistrn=c("gamma"),frail.par=c(0.5,0.5,0.5),
-bhaz.arg=list(distrn = c("weibull"),shape =c(5), scale = c(0.1)),
-covar.arg=list(coefs=c(2),types = c("B"),size=c(1),prob=c(0.5)))
+set.seed(4)
+simdata<-simbcfraildv(psize=300, cenr= c(0.3),beta=c(2),frailty=c("gamma"),
+frailpar=c(0.5,0.5,0.5),bhaz=c("weibull"),
+bhazpar=list(shape =c(5), scale = c(0.1)),
+covartype= c("B"),covarpar=list(fargs=c(1),sargs=c(0.5)))
 dataa<-simdata$data
 
-fitbcfraildv=bcfraildv(Surv(time,censor)~ X1+frailty(PID) ,data=dataa,frail_distrn=c("gamma"))
-fitbcfraildv
-summary(fitbcfraildv)
-names(fitbcfraildv)
+fitbcfrail=bcfraildv(Surv(time,censor)~ X1+frailty(PID) ,data=dataa)
+fitbcfrail
+summary(fitbcfrail)
 
 }
 \seealso{
